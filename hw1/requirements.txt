@@ -1,0 +1,12 @@
+yt-dlp
+# ffmepg need to be installed by this website: https://ffmpeg.org/download.html
+ffmpeg-python
+torch
+torchaudio
+librosa
+numpy
+matplotlib
+seaborn
+scikit-learn
+torchvision
+scipy
