@@ -4,6 +4,7 @@ import os
 from sklearn.svm import SVC
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
 from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
 
@@ -70,7 +71,7 @@ def svm_model(X_train, X_test, y_train, y_test, C=1.0, random_seed=123):
     return accuracy
 
 # plot the accuracy vs. C parameter
-def plot(accuracy):
+def plot(accuracy, use_pca=False):
     plt.figure(figsize=(10, 5))
     
     # Extract keys and values
@@ -81,7 +82,8 @@ def plot(accuracy):
     # Use semilogx since C values are usually on a logarithmic scale
     plt.semilogx(c_values, acc_values, marker='o', linestyle='-')
 
-    plt.title("SVM Accuracy vs. C (Penalty Parameter)")
+    title_suffix = f" - with PCA ({N_COMPONENTS})" if use_pca else ""
+    plt.title("SVM Accuracy vs. C (Penalty Parameter)" + title_suffix)
     plt.xlabel("C Parameter (log scale)")
     plt.ylabel("Accuracy")
     plt.xticks(c_values, c_labels)
@@ -90,13 +92,16 @@ def plot(accuracy):
         plt.text(key, value, f"{value:.4f}", ha='right', va='bottom')
 
     plt.grid(True)
-    plt.savefig('svm_c.png')
+    plt.savefig(f'svm_c{"_PCA" if USE_PCA else ""}.png')
 
 if __name__ == "__main__":
-    data, labels = data_prepare(base_path="dataset/")  # dataset2/
+    data, labels = data_prepare(base_path="dataset1/")  # dataset2/
     
     KFOLDS = 5
     kf = KFold(n_splits=KFOLDS, shuffle=True, random_state=123)
+    
+    USE_PCA = True  # Toggle this to True to enable PCA
+    N_COMPONENTS = 0.95  # Retain 95% of variance if PCA is used
     
     accuracy = {}
     
@@ -116,6 +121,12 @@ if __name__ == "__main__":
             X_train = scaler.fit_transform(X_train)
             X_test = scaler.transform(X_test)
             
+            if USE_PCA:
+                # Apply PCA for dimensionality reduction
+                pca = PCA(n_components=N_COMPONENTS, random_state=123)
+                X_train = pca.fit_transform(X_train)
+                X_test = pca.transform(X_test)
+            
             acc = svm_model(X_train, X_test, y_train, y_test, C=c)
             fold_accs.append(acc)
             
@@ -123,4 +134,4 @@ if __name__ == "__main__":
         accuracy[c] = avg_acc
         print(f"Total Accuracy for C={c}: {avg_acc:.4f}\n")
         
-    plot(accuracy)
+    plot(accuracy, use_pca=USE_PCA)

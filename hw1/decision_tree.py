@@ -86,7 +86,7 @@ def plot(accuracy):
     plt.savefig('decision_tree_depth.png')
 
 if __name__ == "__main__":
-    data, labels = data_prepare(base_path="dataset/")  # dataset2/
+    data, labels = data_prepare(base_path="dataset1/")  # dataset2/
     
     KFOLDS = 5
     kf = KFold(n_splits=KFOLDS, shuffle=True, random_state=123)

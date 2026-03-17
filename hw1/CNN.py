@@ -23,7 +23,7 @@ BATCH_SIZE = 8 # 8, 16, 32, 64
 EPOCHS = 10
 LEARNING_RATE = 0.001
 KFOLDS = 5
-BASE_PATH = "dataset/" # dataset2/
+BASE_PATH = "dataset1/" # dataset2/
 
 # Random seeds
 random.seed(123)
