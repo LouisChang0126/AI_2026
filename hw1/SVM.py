@@ -1,7 +1,7 @@
 import librosa
 import numpy as np
 import os
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.svm import SVC
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
@@ -55,10 +55,10 @@ def data_prepare(base_path="dataset2/"):
     # Return data and labels without splitting here; cross validation handles splitting and scaling
     return data, labels
 
-def decision_tree(X_train, X_test, y_train, y_test, max_depth=5, random_seed=123):
-    # Train a Decision Tree classifier with a maximum depth
-    clf = DecisionTreeClassifier(max_depth=max_depth, random_state=random_seed)
-    print(f"Growing tree with max depth = {max_depth}...")
+def svm_model(X_train, X_test, y_train, y_test, C=1.0, random_seed=123):
+    # Train a Support Vector Machine classifier with a specific C
+    clf = SVC(C=C, kernel='rbf', random_state=random_seed)
+    print(f"Training SVM with C = {C}...")
     clf.fit(X_train, y_train)
 
     # Test the trained model on the test dataset
@@ -69,21 +69,28 @@ def decision_tree(X_train, X_test, y_train, y_test, max_depth=5, random_seed=123
     print(f"Testing Accuracy: {accuracy:.4f}")
     return accuracy
 
-# plot the accuracy vs. max depth
+# plot the accuracy vs. C parameter
 def plot(accuracy):
     plt.figure(figsize=(10, 5))
-    plt.plot(accuracy.keys(), accuracy.values(), marker='o', linestyle='-')
+    
+    # Extract keys and values
+    c_values = list(accuracy.keys())
+    c_labels = [str(c) for c in c_values]
+    acc_values = list(accuracy.values())
+    
+    # Use semilogx since C values are usually on a logarithmic scale
+    plt.semilogx(c_values, acc_values, marker='o', linestyle='-')
 
-    plt.title("Decision Tree Accuracy vs. Max Depth")
-    plt.xlabel("Max Depth")
+    plt.title("SVM Accuracy vs. C (Penalty Parameter)")
+    plt.xlabel("C Parameter (log scale)")
     plt.ylabel("Accuracy")
-    plt.xticks(list(accuracy.keys()))
+    plt.xticks(c_values, c_labels)
 
     for key, value in accuracy.items():
         plt.text(key, value, f"{value:.4f}", ha='right', va='bottom')
 
     plt.grid(True)
-    plt.savefig('decision_tree_depth.png')
+    plt.savefig('svm_c.png')
 
 if __name__ == "__main__":
     data, labels = data_prepare(base_path="dataset/")  # dataset2/
@@ -92,9 +99,13 @@ if __name__ == "__main__":
     kf = KFold(n_splits=KFOLDS, shuffle=True, random_state=123)
     
     accuracy = {}
-    for i in range(3, 24, 2):
+    
+    # A typical list of C values to test
+    c_list = [0.01, 0.1, 1, 10, 100, 1000]
+    
+    for c in c_list:
         fold_accs = []
-        print(f"--- Evaluating max_depth = {i} ---")
+        print(f"--- Evaluating C = {c} ---")
         for fold, (train_idx, val_idx) in enumerate(kf.split(data)):
             print(f"Fold {fold+1}/{KFOLDS}")
             X_train, X_test = data[train_idx], data[val_idx]
@@ -105,11 +116,11 @@ if __name__ == "__main__":
             X_train = scaler.fit_transform(X_train)
             X_test = scaler.transform(X_test)
             
-            acc = decision_tree(X_train, X_test, y_train, y_test, max_depth=i)
+            acc = svm_model(X_train, X_test, y_train, y_test, C=c)
             fold_accs.append(acc)
             
         avg_acc = np.mean(fold_accs)
-        accuracy[i] = avg_acc
-        print(f"Total Accuracy for max_depth={i}: {avg_acc:.4f}\n")
+        accuracy[c] = avg_acc
+        print(f"Total Accuracy for C={c}: {avg_acc:.4f}\n")
         
     plot(accuracy)
