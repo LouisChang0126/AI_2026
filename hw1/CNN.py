@@ -11,7 +11,6 @@ import seaborn as sns
 from sklearn.model_selection import KFold
 from sklearn.metrics import confusion_matrix, accuracy_score
 from torch.utils.data import Dataset, DataLoader, Subset
-from torchvision import transforms
 
 # Set device to GPU
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -66,16 +65,15 @@ class AudioDataset(Dataset):
         print(f"Dataset loaded: {len(self.data)} samples")
 
         # Define transformation for input data
-        self.transform = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.5], std=[0.5])
-        ])
+        # Processed directly in __getitem__ to avoid torchvision dependency
 
     def __len__(self):
         return len(self.data)
 
     def __getitem__(self, idx):
-        mel_spec = self.transform(self.data[idx])  # Apply transformation
+        # Apply transformation: equivalent to ToTensor() + Normalize(mean=[0.5], std=[0.5])
+        mel_spec = torch.tensor(self.data[idx], dtype=torch.float32).unsqueeze(0)
+        mel_spec = (mel_spec - 0.5) / 0.5
         label = torch.tensor(self.labels[idx], dtype=torch.long)
         return mel_spec, label
 
@@ -110,13 +108,15 @@ def plot_confusion_matrix(y_true, y_pred, class_names):
     # Plots a confusion matrix for predictions.
     cm = confusion_matrix(y_true, y_pred)
     plt.figure(figsize=(14, 12))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
-    plt.xlabel('Predicted')
-    plt.ylabel('True')
-    plt.title('Confusion Matrix')
-    plt.xticks(rotation=45)
-    plt.yticks(rotation=0)
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', annot_kws={"size": 40}, xticklabels=class_names, yticklabels=class_names)
+    plt.xlabel('Predicted', fontsize=22)
+    plt.ylabel('True', fontsize=22)
+    plt.title('Confusion Matrix', fontsize=26)
+    plt.xticks(rotation=45, fontsize=18)
+    plt.yticks(rotation=0, fontsize=18)
+    plt.tight_layout()
     plt.savefig('confusion_matrix.png')
+    plt.close()
 
 if __name__ == "__main__":
     # Dataset and class labels
@@ -127,6 +127,8 @@ if __name__ == "__main__":
     kf = KFold(n_splits=KFOLDS, shuffle=True, random_state=123)
 
     # Cross validation
+    all_y_true = []
+    all_y_pred = []
     for fold, (train_idx, val_idx) in enumerate(kf.split(dataset)):
         print(f"Fold {fold+1}/{KFOLDS}")
         train_subset = Subset(dataset, train_idx)
@@ -164,6 +166,8 @@ if __name__ == "__main__":
         acc = accuracy_score(y_true, y_pred)
         accs.append(acc)
         print(f"Fold {fold+1} Accuracy: {acc:.4f}")
-        plot_confusion_matrix(y_true, y_pred, class_names)
+        all_y_true.extend(y_true)
+        all_y_pred.extend(y_pred)
     
     print(f"Total Accuracy: {np.mean(accs):.4f}")
+    plot_confusion_matrix(all_y_true, all_y_pred, class_names)
