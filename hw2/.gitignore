@@ -1,0 +1,24 @@
+# Data
+data/
+
+# Checkpoints
+checkpoints/
+
+# Logs & plots
+logs/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

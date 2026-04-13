@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip list:*)",
+      "Bash(pip3 list:*)",
+      "Bash(conda list:*)",
+      "Bash(python -c \"import torchvision; print\\(torchvision.models.resnet18\\(\\)\\)\")",
+      "Bash(conda create:*)"
+    ]
+  }
+}
