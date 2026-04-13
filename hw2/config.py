@@ -65,8 +65,9 @@ def get_config() -> Config:
 
     for f in fields(Config):
         ftype = f.type
-        # Handle Optional[str]
-        if ftype is Optional[str]:
+        # Handle Optional[str] — check string representation as fallback
+        if ftype is Optional[str] or str(ftype) in ("typing.Optional[str]",
+                                                      "str | None"):
             ftype = str
         if ftype is bool:
             parser.add_argument(

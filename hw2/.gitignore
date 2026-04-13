@@ -4,9 +4,6 @@ data/
 # Checkpoints
 checkpoints/
 
-# Logs & plots
-logs/
-
 # Python
 __pycache__/
 *.pyc
