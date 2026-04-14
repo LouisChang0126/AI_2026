@@ -58,8 +58,8 @@ def generate_augmentation_examples():
             break
 
     # Transposed layout: 3 rows (Original, View1, View2) x 10 columns (classes)
-    fig, axes = plt.subplots(3, 10, figsize=(16, 5))
-    fig.subplots_adjust(wspace=0.05, hspace=0.15)
+    fig, axes = plt.subplots(3, 10, figsize=(18, 5.5))
+    fig.subplots_adjust(wspace=0.08, hspace=0.2)
 
     row_labels = ["Original", "View 1", "View 2"]
     to_tensor = T.ToTensor()
@@ -70,7 +70,7 @@ def generate_augmentation_examples():
         # Original
         orig_tensor = to_tensor(img_pil)
         axes[0, col].imshow(orig_tensor.permute(1, 2, 0).numpy())
-        axes[0, col].set_title(f"{CLASSES[label]}", fontsize=8, pad=2)
+        axes[0, col].set_title(f"{CLASSES[label]}", fontsize=16, fontweight="bold", pad=4)
 
         # Two augmented views
         view1, view2 = aug(img_pil)
@@ -80,7 +80,7 @@ def generate_augmentation_examples():
 
     # Row labels on left
     for r, lbl in enumerate(row_labels):
-        axes[r, 0].set_ylabel(lbl, fontsize=9, rotation=90, labelpad=8)
+        axes[r, 0].set_ylabel(lbl, fontsize=18, fontweight="bold", rotation=90, labelpad=12)
 
     # Remove all ticks
     for ax in axes.flat:
@@ -160,8 +160,8 @@ def generate_knn_examples():
         query_indices.append(idx)
 
     n_rows = k + 1  # query + k neighbors
-    fig, axes = plt.subplots(n_rows, 10, figsize=(16, 10))
-    fig.subplots_adjust(wspace=0.05, hspace=0.25)
+    fig, axes = plt.subplots(n_rows, 10, figsize=(18, 11))
+    fig.subplots_adjust(wspace=0.08, hspace=0.35)
 
     for col, q_idx in enumerate(query_indices):
         q_feat = test_feats[q_idx:q_idx+1]
@@ -170,10 +170,10 @@ def generate_knn_examples():
         # Query image (row 0)
         q_img, _ = raw_test[q_idx]
         axes[0, col].imshow(q_img)
-        axes[0, col].set_title(f"{CLASSES[q_label]}", fontsize=8, fontweight="bold", pad=2)
+        axes[0, col].set_title(f"{CLASSES[q_label]}", fontsize=16, fontweight="bold", pad=4)
         for spine in axes[0, col].spines.values():
             spine.set_edgecolor("blue")
-            spine.set_linewidth(2)
+            spine.set_linewidth(2.5)
 
         # kNN neighbors (rows 1..k)
         sims = (q_feat @ feat_bank.T).squeeze(0)
@@ -188,15 +188,18 @@ def generate_knn_examples():
             ax.imshow(nb_img)
             match = nb_label == q_label
             color = "green" if match else "red"
-            ax.set_title(f"{sim_val:.2f}", fontsize=7, color=color, pad=1)
+            ax.set_title(f"{sim_val:.2f}", fontsize=15, fontweight="bold",
+                         color=color, pad=3)
             for spine in ax.spines.values():
                 spine.set_edgecolor(color)
-                spine.set_linewidth(1.5)
+                spine.set_linewidth(2)
 
     # Row labels on left
-    axes[0, 0].set_ylabel("Query", fontsize=9, rotation=90, labelpad=8)
+    axes[0, 0].set_ylabel("Query", fontsize=18, fontweight="bold",
+                           rotation=90, labelpad=12)
     for r in range(1, n_rows):
-        axes[r, 0].set_ylabel(f"NN-{r}", fontsize=8, rotation=90, labelpad=8)
+        axes[r, 0].set_ylabel(f"NN-{r}", fontsize=16, fontweight="bold",
+                               rotation=90, labelpad=12)
 
     for ax in axes.flat:
         ax.set_xticks([])

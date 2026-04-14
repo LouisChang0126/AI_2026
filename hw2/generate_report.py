@@ -231,11 +231,11 @@ def build_report():
     )
 
     add_figure(doc, img("visuals/augmentation_examples.png"),
-               "Figure 0: SimCLR augmentation examples — original image (left) and two "
+               "Figure 1: SimCLR augmentation examples — original image (left) and two "
                "independently augmented views (middle, right) for each CIFAR-10 class.",
                width=Inches(3.8))
     add_para(doc,
-        "Figure 0 shows augmentation examples for all 10 CIFAR-10 classes. Each row displays "
+        "Figure 1 shows augmentation examples for all 10 CIFAR-10 classes. Each row displays "
         "the original image and two independently sampled views. The diversity of crops, color "
         "shifts, and grayscale conversions forces the model to learn content-invariant features "
         "rather than relying on color or spatial cues."
@@ -275,14 +275,14 @@ def build_report():
     add_heading(doc, "3.1 SimCLR Baseline", level=2)
 
     add_side_by_side_figures(doc,
-        img("baseline/loss_curve.png"), "Figure 1a: NT-Xent Loss",
-        img("baseline/knn_curve.png"), "Figure 1b: kNN Accuracy (k=20)",
+        img("baseline/loss_curve.png"), "Figure 2a: NT-Xent Loss",
+        img("baseline/knn_curve.png"), "Figure 2b: kNN Accuracy (k=20)",
     )
 
     add_para(doc,
-        "The NT-Xent loss decreases steadily from 5.265 to 4.502 over 200 epochs (Fig. 1a). "
+        "The NT-Xent loss decreases steadily from 5.265 to 4.502 over 200 epochs (Fig. 2a). "
         "The kNN accuracy rises rapidly in early training — reaching 63.3% by epoch 10 — "
-        "and continues improving to 84.55% at epoch 200, though gains slow after epoch 100 (Fig. 1b)."
+        "and continues improving to 84.55% at epoch 200, though gains slow after epoch 100 (Fig. 2b)."
     )
 
     add_table(doc,
@@ -294,7 +294,7 @@ def build_report():
     # --- 3.2 Linear Probing ---
     add_heading(doc, "3.2 Linear Probing on SSL Model", level=2)
     add_figure(doc, img("ssl_probe/linear_probe_acc.png"),
-               "Figure 2: SSL Linear Probing Accuracy on CIFAR-10", width=Inches(4.0))
+               "Figure 3: SSL Linear Probing Accuracy on CIFAR-10", width=Inches(4.0))
     add_para(doc,
         "Freezing the SimCLR backbone and training a linear classifier for 100 epochs yields "
         "a final test accuracy of 86.60%, confirming that the learned representations are "
@@ -304,8 +304,8 @@ def build_report():
     # --- 3.3 Supervised ---
     add_heading(doc, "3.3 Supervised Baseline", level=2)
     add_side_by_side_figures(doc,
-        img("supervised/loss_curve.png"), "Figure 3a: Supervised Loss",
-        img("supervised/accuracy_curve.png"), "Figure 3b: Supervised Accuracy",
+        img("supervised/loss_curve.png"), "Figure 4a: Supervised Loss",
+        img("supervised/accuracy_curve.png"), "Figure 4b: Supervised Accuracy",
     )
     add_para(doc,
         "The supervised model reaches 99.65% train accuracy but 91.51% test accuracy "
@@ -326,19 +326,20 @@ def build_report():
     add_para(doc,
         "SimCLR linear probing (86.60%) trails supervised learning (91.51%) by only 4.91 "
         "percentage points — despite using zero labels for backbone training. The random baseline "
-        "(40.29%) confirms that the SSL training provides substantial representation quality: "
-        "SSL recovers approximately 90% of the improvement that supervised learning achieves "
-        "over random features (46.31 / 51.22 ≈ 90.4%)."
+        "(40.29%) confirms that SSL training provides substantial representation quality. "
+        "To quantify: the improvement of SSL over random is 86.60 − 40.29 = 46.31%, while "
+        "the improvement of supervised over random is 91.51 − 40.29 = 51.22%. Thus, SSL "
+        "recovers 46.31 / 51.22 ≈ 90.4% of the supervised learning improvement — using zero labels."
     )
 
     add_figure(doc, img("visuals/knn_retrieval_examples.png"),
-               "Figure 4: kNN retrieval examples — for each query image (blue border, left), "
+               "Figure 5: kNN retrieval examples — for each query image (blue border, left), "
                "the 5 nearest neighbors from the training set are shown. Green borders indicate "
                "correct class matches; red borders indicate mismatches. Cosine similarity scores "
                "are displayed above each neighbor.",
                width=Inches(5.2))
     add_para(doc,
-        "Figure 4 provides qualitative evidence of representation quality. For most classes, "
+        "Figure 5 provides qualitative evidence of representation quality. For most classes, "
         "all 5 nearest neighbors share the same class as the query, and similarity scores are "
         "high (>0.85). Mismatches tend to occur between visually similar classes (e.g., automobile "
         "and truck), revealing interpretable failure modes that reflect genuine visual similarity "
@@ -357,8 +358,8 @@ def build_report():
 
     # Loss curves side by side
     add_side_by_side_figures(doc,
-        img("temp01/loss_curve.png"), "Figure 4a: Loss (τ=0.1)",
-        img("temp50/loss_curve.png"), "Figure 4b: Loss (τ=5.0)",
+        img("temp01/loss_curve.png"), "Figure 6a: Loss (τ=0.1)",
+        img("temp50/loss_curve.png"), "Figure 6b: Loss (τ=5.0)",
     )
 
     add_table(doc,
@@ -376,8 +377,8 @@ def build_report():
 
     # kNN curves
     add_side_by_side_figures(doc,
-        img("temp01/knn_curve.png"), "Figure 5a: kNN (τ=0.1)",
-        img("temp50/knn_curve.png"), "Figure 5b: kNN (τ=5.0)",
+        img("temp01/knn_curve.png"), "Figure 7a: kNN (τ=0.1)",
+        img("temp50/knn_curve.png"), "Figure 7b: kNN (τ=5.0)",
     )
 
     add_table(doc,
@@ -409,8 +410,8 @@ def build_report():
     add_heading(doc, "3.6 Projector Head Ablation", level=2)
 
     add_side_by_side_figures(doc,
-        img("no_proj/loss_curve.png"), "Figure 6a: No Projector — Loss",
-        img("no_proj/knn_curve.png"), "Figure 6b: No Projector — kNN",
+        img("no_proj/loss_curve.png"), "Figure 8a: No Projector — Loss",
+        img("no_proj/knn_curve.png"), "Figure 8b: No Projector — kNN",
     )
 
     add_table(doc,
