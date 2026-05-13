@@ -1,0 +1,8 @@
+__pycache__/
+A2C/
+PPO/
+*/videos/
+*.mp4
+*.zip
+*pkl
+*.npz
